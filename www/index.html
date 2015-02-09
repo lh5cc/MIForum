@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Untitled Document</title>
+<link href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" rel="stylesheet" type="text/css">
+<link href="themes/jquery.mobile.icons.min.css" rel="stylesheet" type="text/css">
+<link href="themes/MIForum.min.css" rel="stylesheet" type="text/css">
+<script src="http://code.jquery.com/jquery-1.11.1.min.js" type="text/javascript"></script>
+<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js" type="text/javascript"></script>
+<script src="https://cdn.firebase.com/js/client/2.0.4/firebase.js"></script>
+</head>
+
+<body>
+
+<div data-role="page" id="page">
+  <div data-role="panel" id="panel2" data-position="right" data-display="overlay"
+    data-theme="a">
+        <ul data-role="listview" data-divider-theme="a" data-inset="false">
+            <li data-role="list-divider" role="heading">
+                大范甘迪
+            </li>
+            <li data-theme="a">
+                <a href="#page1" data-transition="slide">
+                    地方
+                    <span class="ui-li-count">
+                        自行车自行车
+                    </span>
+                </a>
+            </li>
+        </ul>
+</div>
+  <div data-theme="a" data-role="header" data-position="fixed">
+    <h1>蜜蜂窝</h1>
+    <a data-controltype="panelbutton" data-role="button" data-inline="false"
+        data-theme="h" href="#panel2" data-icon="bars" data-iconpos="notext">
+        </a>
+        
+        <div data-role="navbar" data-iconpos="top">
+            <ul>
+                <li>
+                    <a href="#page1" data-transition="none" data-theme="d" data-icon="gear">
+                        发现
+                    </a>
+                </li>
+                <li>
+                    <a href="#page3" data-transition="none" data-theme="d" data-icon="alert">
+                        公开课
+                    </a>
+                </li>
+                <li>
+                  
+                    <a href="#page1" data-transition="none" data-theme="d" data-icon="search">
+                        知乎
+                    </a>
+                </li>
+                <li>
+                    <a href="#page1" data-transition="none" data-theme="a" data-icon="info">
+                        排名
+                    </a>
+                </li>
+                <li>
+                    <a href="#page1" data-transition="none" data-theme="a" data-icon="star">
+                        测试
+                    </a>
+                </li>
+            </ul>
+        </div>
+  </div>
+  <div data-role="content">Content</div>
+  <ul id="hp_news_list" data-role="listview" data-icon="false">
+    
+  </ul>
+
+ </div>
+ <script>
+  var LEADERBOARD_SIZE = 5;
+
+  // Create our Firebase reference
+  var scoreListRef = new Firebase('https://torid-inferno-7354.firebaseio.com/app/homepage/listviews/news');
+
+  // Keep a mapping of firebase locations to HTML elements, so we can move / remove elements as necessary.
+  var htmlForPath = {};
+
+  // Helper function that takes a new score snapshot and adds an appropriate row to our leaderboard table.
+  function handleScoreAdded(scoreSnapshot, prevScoreName) {
+    
+	var innerRow = $("<a href=\""+scoreSnapshot.val().hyperlink+"\" class=\"li ui-btn\">");
+	//newScoreRow.append();
+	innerRow.append("<img src=\"data:image/png;base64,"+scoreSnapshot.val().icon+"\" width=\"540\" height=\"960\"/>");
+    innerRow.append($("<h3/>").text(scoreSnapshot.val().title));
+	innerRow.append($("<p/>").text(scoreSnapshot.val().summary));
+	innerRow.append($("<p class=\"ui-li-aside\"/>").text(scoreSnapshot.val().category));
+	var newScoreRow = $("<li class=\"ui-li-has-thumb\"/>").append(innerRow);
+
+    htmlForPath[scoreSnapshot.key()] = newScoreRow;
+
+    // Insert the new score in the appropriate place in the table.
+    if (prevScoreName === null) {
+      $("#hp_news_list").append(newScoreRow);
+    }
+    else {
+      var lowerScoreRow = htmlForPath[prevScoreName];
+      lowerScoreRow.before(newScoreRow);
+    }
+  }
+
+  // Create a view to only receive callbacks for the last LEADERBOARD_SIZE scores
+  var scoreListView = scoreListRef.limitToLast(LEADERBOARD_SIZE);
+
+  // Add a callback to handle when a new score is added.
+  scoreListView.on('child_added', function (newScoreSnapshot, prevScoreName) {
+    handleScoreAdded(newScoreSnapshot, prevScoreName);
+  });
+</script>
+
+</body>
+</html>
